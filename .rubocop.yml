@@ -9,7 +9,7 @@ AllCops:
     - !ruby/regexp /old_and_unused\.rb$/
 
 #Enable these when we want to start heavy refactoring
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
   Max: 100
 Style/Documentation:
@@ -20,13 +20,13 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/ClassLength: 
   Max: 250
-Rails/HasAndBelongsToMany:
-  Enabled: false
+# Rails/HasAndBelongsToMany:
+  # Enabled: false
 
 #Enable these once java is gone
-Style/VariableName:
+Naming/VariableName:
   Enabled: false
-Style/MethodName:
+Naming/MethodName:
   Enabled: false
 Metrics/ParameterLists:
   Enabled: false
@@ -36,3 +36,24 @@ Metrics/ParameterLists:
 Lint/Void:
   Exclude:
     - 'spec/**/*'
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: false
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: false
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: false
+Lint/RaiseException:
+  Enabled: false
+Lint/StructNewOverride:
+  Enabled: false
+Style/ExponentialNotation:
+  Enabled: false
+Style/HashEachMethods:
+  Enabled: false
+Style/HashTransformKeys:
+  Enabled: false
+Style/HashTransformValues:
+  Enabled: false
+Style/SlicingWithRange:
+  Enabled: false

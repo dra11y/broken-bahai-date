@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
 require 'tzinfo'
 require 'solareventcalculator'
@@ -16,8 +18,8 @@ module BahaiDate
     #         Latitude: 35° 41' 45.9996", Longitude: 51° 25' 23.0016"
     # Converted to decimal using:
     #         http://transition.fcc.gov/mb/audio/bickel/DDDMMSS-decimal.html
-    TEHRAN_LAT = BigDecimal.new('35.696111')
-    TEHRAN_LONG = BigDecimal.new('51.423056')
+    TEHRAN_LAT = BigDecimal('35.696111')
+    TEHRAN_LONG = BigDecimal('51.423056')
 
     # *** Azimuth (for determining sunset times) ***
     # Source: http://www.timeanddate.com/astronomy/about-sun-calculator.html
@@ -100,14 +102,12 @@ module BahaiDate
     private
 
     def localize(time)
-      (@tz.utc_to_local(time)).to_time
+      @tz.utc_to_local(time).to_time
     end
 
     def increment_if_after_sunset(time)
       date = time.to_date
-      if time > sunset_time_for(date)
-        date += 1
-      end
+      date += 1 if time > sunset_time_for(date)
       date
     end
   end
