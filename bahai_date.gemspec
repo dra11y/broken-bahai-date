@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>=2.0'
   s.add_runtime_dependency 'tzinfo', '~> 1.2'
   s.add_runtime_dependency 'RubySunrise', '~> 0.3'
-  s.add_runtime_dependency 'astro-algo', '~> 0'
+  s.add_runtime_dependency 'astro-algo', '~> 0.0.1'
   s.add_development_dependency 'rspec', '~> 3'
   s.add_development_dependency 'simplecov', '~> 0'
 end
