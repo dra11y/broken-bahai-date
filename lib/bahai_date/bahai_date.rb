@@ -4,8 +4,12 @@ module BahaiDate
 
     attr_reader :weekday, :day, :month, :year, :gregorian_date
 
-    def initialize(params, tz: nil, lat: nil, lng: nil)
-      @logic = Logic.new(tz: tz, lat: lat, lng: lng)
+    def initialize(params)
+      if params[:date].respond_to?(:time_zone)
+        @tz = params[:tz] || params[:date].try(:time_zone).try(:name)
+      end
+
+      @logic = Logic.new(tz: @tz, lat: params[:lat], lng: params[:lng])
 
       if params[:date]
         @gregorian_date = params[:date]
@@ -34,7 +38,7 @@ module BahaiDate
     end
 
     def long_format
-      "#{@weekday} #{@day.number} #{@month} #{@year.bahai_era} B.E."
+      "#{@weekday.html} #{@day.number} #{@month.html} #{@year.bahai_era} B.E."
     end
 
     def short_format
@@ -47,6 +51,14 @@ module BahaiDate
 
     def -(val)
       self.class.new(date: @gregorian_date - val)
+    end
+
+    def sunset_time
+      @logic.sunset_time_for(@gregorian_date.utc.to_date)
+    end
+
+    def next_sunset_time
+      @logic.sunset_time_for(@gregorian_date.utc.to_date + 1.day)
     end
 
     private
@@ -69,12 +81,15 @@ module BahaiDate
       nawruz = @logic.nawruz_for(@gregorian_date.year)
 
       year = @gregorian_date.year - 1844
-      if @gregorian_date >= nawruz
+      if @gregorian_date >= @logic.sunset_time_for(nawruz)
         year += 1
-        days = (@gregorian_date - nawruz).to_i
+        days = (@gregorian_date.to_date - nawruz).to_i
       else
-        days = (@gregorian_date - @logic.nawruz_for(@gregorian_date.year - 1)).to_i
+        days = (@gregorian_date.to_date - @logic.nawruz_for(@gregorian_date.year - 1)).to_i
       end
+      current_sunset = @logic.sunset_time_for(@gregorian_date.utc.to_date)
+      days += 1 if @gregorian_date > current_sunset &&
+                   @gregorian_date.to_date == current_sunset.to_date
 
       # determine day and month, taking into account ayyam-i-ha
       if days >= 342
@@ -95,7 +110,11 @@ module BahaiDate
 
     def weekday_from_gregorian
       # saturday (6 in ruby) is the first day of the week
-      @gregorian_date.wday == 6 ? 1 : @gregorian_date.wday + 2
+      wday = @gregorian_date.wday == 6 ? 1 : @gregorian_date.wday + 2
+      current_sunset = @logic.sunset_time_for(@gregorian_date.utc.to_date)
+      wday += 1 if @gregorian_date > current_sunset &&
+                   @gregorian_date < current_sunset.end_of_day
+      wday == 7 ? 7 : wday % 7
     end
 
     def days_from_nawruz

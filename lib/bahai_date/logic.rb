@@ -7,6 +7,7 @@ require 'astro-algo'
 
 module BahaiDate
   class Logic
+    attr_reader :lat, :lng, :tz
     ####
     # Note: This class uses dates in the Gregorian calendar internally, as they
     # are used by the libraries which determine leap years, the spring equinox
@@ -29,7 +30,7 @@ module BahaiDate
     AZIMUTH = 90.833333
 
     def initialize(tz: nil, lat: nil, lng: nil)
-      @tz = tz || TZInfo::Timezone.get('Asia/Tehran')
+      @tz = TZInfo::Timezone.get(tz || 'Asia/Tehran')
       @lat = lat || TEHRAN_LAT
       @lng = lng || TEHRAN_LONG
     end
@@ -38,7 +39,7 @@ module BahaiDate
       if year < 2015
         Date.new(year, 3, 21)
       else
-        spring_equinox_in_tehran(year)
+        local_spring_equinox(year)
       end
     end
     alias nawruz_date nawruz_for
@@ -48,13 +49,17 @@ module BahaiDate
     end
 
     def sunset_time_for(date)
-      calc = SolarEventCalculator.new(date, @lat, @lng)
-      sunset_time = calc.compute_utc_solar_event(AZIMUTH, false)
-      localize(sunset_time.utc)
+      # calc = SolarEventCalculator.new(date, lat, lng)
+      # sunset_time = calc.compute_utc_solar_event(AZIMUTH, false)
+      # localize(sunset_time.utc)
+      calc = SolarEventCalculator.new(date, lat, lng)
+      localize(calc.compute_official_sunset(tz.identifier))
     end
 
-    def spring_equinox_in_tehran(year)
-      increment_if_after_sunset localize(Astro.date_of_vernal_equinox(year).to_utc)
+    def local_spring_equinox(year)
+      # increment_if_after_sunset localize(Astro.date_of_vernal_equinox(year).to_utc)
+      # localize(Astro.date_of_vernal_equinox(year).to_utc).to_date
+      localize(Astro.date_of_vernal_equinox(year).to_utc).to_date
     end
 
     def twin_holy_days_for(year_bahai_era)
@@ -89,8 +94,6 @@ module BahaiDate
     def bahai_era_to_gregorian_year(year)
       1843 + year
     end
-
-    private
 
     def localize(time)
       @tz.utc_to_local(time).to_time
