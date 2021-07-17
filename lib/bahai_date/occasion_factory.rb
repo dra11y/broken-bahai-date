@@ -156,6 +156,15 @@ module BahaiDate
       all_dates.find { |_key, array| array.include? occasion }.first
     end
 
+    def self.dates_lunar(year)
+      twin = Logic.new.twin_holy_days_for year
+      birth_bab = BahaiDate.new(date: twin)
+      birth_bab_string = "#{birth_bab.month.number}.#{birth_bab.day.number}"
+      birth_bahaullah = BahaiDate.new(date: twin + 1)
+      birth_bahaullah_string = "#{birth_bahaullah.month.number}.#{birth_bahaullah.day.number}"
+      { birth_bab_string => [:birth_bab], birth_bahaullah_string => [:birth_bahaullah] }
+    end
+
     private
 
     def create_occasions_classes_from(hashes_array)
@@ -180,15 +189,6 @@ module BahaiDate
         yield DATES_AFTER_172[key]
         yield (self.class.dates_lunar(@year))[key]
       end
-    end
-
-    def self.dates_lunar(year)
-      twin = Logic.twin_holy_days_date year
-      birth_bab = BahaiDate.new(date: twin)
-      birth_bab_string = "#{birth_bab.month.number}.#{birth_bab.day.number}"
-      birth_bahaullah = BahaiDate.new(date: twin + 1)
-      birth_bahaullah_string = "#{birth_bahaullah.month.number}.#{birth_bahaullah.day.number}"
-      { birth_bab_string => [:birth_bab], birth_bahaullah_string => [:birth_bahaullah] }
     end
   end
 end

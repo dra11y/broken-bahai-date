@@ -16,10 +16,16 @@ Style/Documentation:
   Enabled: false
 Metrics/MethodLength:
   Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Naming/MethodParameterName:
+  Enabled: false
 Metrics/CyclomaticComplexity:
   Enabled: false
-Metrics/ClassLength: 
+Metrics/ClassLength:
   Max: 250
+Metrics/AbcSize:
+  Max: 200
 # Rails/HasAndBelongsToMany:
   # Enabled: false
 

@@ -28,36 +28,27 @@ module BahaiDate
     #         http://www.satsig.net/degrees-minutes-seconds-calculator.htm
     AZIMUTH = 90.833333
 
-    def initialize
-      @tz = TZInfo::Timezone.get('Asia/Tehran')
+    def initialize(tz: nil, lat: nil, lng: nil)
+      @tz = tz || TZInfo::Timezone.get('Asia/Tehran')
+      @lat = lat || TEHRAN_LAT
+      @lng = lng || TEHRAN_LONG
     end
 
-    def self.nawruz_for(year)
-      new.nawruz_date year
-    end
-
-    def self.leap?(year_bahai_era)
-      new.leap? year_bahai_era
-    end
-
-    def self.twin_holy_days_date(year_bahai_era)
-      new.twin_holy_days_for year_bahai_era
-    end
-
-    def nawruz_date(year)
+    def nawruz_for(year)
       if year < 2015
         Date.new(year, 3, 21)
       else
         spring_equinox_in_tehran(year)
       end
     end
+    alias nawruz_date nawruz_for
 
     def nawruz_time(year)
       sunset_time_for(nawruz_date(year))
     end
 
     def sunset_time_for(date)
-      calc = SolarEventCalculator.new(date, TEHRAN_LAT, TEHRAN_LONG)
+      calc = SolarEventCalculator.new(date, @lat, @lng)
       sunset_time = calc.compute_utc_solar_event(AZIMUTH, false)
       localize(sunset_time.utc)
     end

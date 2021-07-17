@@ -4,7 +4,9 @@ module BahaiDate
 
     attr_reader :weekday, :day, :month, :year, :gregorian_date
 
-    def initialize(params)
+    def initialize(params, tz: nil, lat: nil, lng: nil)
+      @logic = Logic.new(tz: tz, lat: lat, lng: lng)
+
       if params[:date]
         @gregorian_date = params[:date]
         year, month, day = from_gregorian
@@ -54,24 +56,24 @@ module BahaiDate
     end
 
     def ayyam_i_ha_days(year = @year.bahai_era)
-      Logic.leap?(year) ? 5 : 4
+      @logic.leap?(year) ? 5 : 4
     end
 
     def to_gregorian
       year_gregorian = @year.bahai_era + 1844 - 1
-      nawruz = Logic.nawruz_for(year_gregorian)
+      nawruz = @logic.nawruz_for(year_gregorian)
       nawruz + days_from_nawruz
     end
 
     def from_gregorian
-      nawruz = Logic.nawruz_for(@gregorian_date.year)
+      nawruz = @logic.nawruz_for(@gregorian_date.year)
 
       year = @gregorian_date.year - 1844
       if @gregorian_date >= nawruz
         year += 1
         days = (@gregorian_date - nawruz).to_i
       else
-        days = (@gregorian_date - Logic.nawruz_for(@gregorian_date.year - 1)).to_i
+        days = (@gregorian_date - @logic.nawruz_for(@gregorian_date.year - 1)).to_i
       end
 
       # determine day and month, taking into account ayyam-i-ha
