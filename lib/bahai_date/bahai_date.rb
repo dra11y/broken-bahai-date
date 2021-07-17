@@ -53,12 +53,16 @@ module BahaiDate
       self.class.new(date: @gregorian_date - val)
     end
 
+    def utc_date(date = @gregorian_date)
+      date.respond_to?(:utc) ? date.utc.to_date : date
+    end
+
     def sunset_time
-      @logic.sunset_time_for(@gregorian_date.utc.to_date)
+      @logic.sunset_time_for(utc_date)
     end
 
     def next_sunset_time
-      @logic.sunset_time_for(@gregorian_date.utc.to_date + 1.day)
+      @logic.sunset_time_for(utc_date + 1.day)
     end
 
     private
@@ -87,7 +91,7 @@ module BahaiDate
       else
         days = (@gregorian_date.to_date - @logic.nawruz_for(@gregorian_date.year - 1)).to_i
       end
-      current_sunset = @logic.sunset_time_for(@gregorian_date.utc.to_date)
+      current_sunset = sunset_time
       days += 1 if @gregorian_date > current_sunset &&
                    @gregorian_date.to_date == current_sunset.to_date
 
@@ -111,7 +115,7 @@ module BahaiDate
     def weekday_from_gregorian
       # saturday (6 in ruby) is the first day of the week
       wday = @gregorian_date.wday == 6 ? 1 : @gregorian_date.wday + 2
-      current_sunset = @logic.sunset_time_for(@gregorian_date.utc.to_date)
+      current_sunset = sunset_time
       wday += 1 if @gregorian_date > current_sunset &&
                    @gregorian_date < current_sunset.end_of_day
       wday == 7 ? 7 : wday % 7
