@@ -5,6 +5,9 @@ module BahaiDate
     attr_reader :weekday, :day, :month, :year, :gregorian_date
 
     def initialize(params)
+      params[:use_sunset] = true if params[:use_sunset].nil?
+      @use_sunset = params[:use_sunset]
+
       if params[:date].respond_to?(:time_zone)
         @tz = params[:tz] || params[:date].try(:time_zone).try(:name)
       end
@@ -46,11 +49,11 @@ module BahaiDate
     end
 
     def +(val)
-      self.class.new(date: @gregorian_date + val)
+      self.class.new(date: @gregorian_date + val, use_sunset: @use_sunset)
     end
 
     def -(val)
-      self.class.new(date: @gregorian_date - val)
+      self.class.new(date: @gregorian_date - val, use_sunset: @use_sunset)
     end
 
     def utc_date(date = @gregorian_date)
@@ -85,15 +88,19 @@ module BahaiDate
       nawruz = @logic.nawruz_for(@gregorian_date.year)
 
       year = @gregorian_date.year - 1844
-      if @gregorian_date >= @logic.sunset_time_for(nawruz)
+      if (@use_sunset && @gregorian_date >= @logic.sunset_time_for(nawruz)) ||
+         (!@use_sunset && @gregorian_date.to_date >= nawruz)
         year += 1
         days = (@gregorian_date.to_date - nawruz).to_i
       else
         days = (@gregorian_date.to_date - @logic.nawruz_for(@gregorian_date.year - 1)).to_i
       end
-      current_sunset = sunset_time
-      days += 1 if @gregorian_date > current_sunset &&
-                   @gregorian_date.to_date == current_sunset.to_date
+
+      if @use_sunset
+        current_sunset = sunset_time
+        days += 1 if @gregorian_date > current_sunset &&
+                    @gregorian_date.to_date == current_sunset.to_date
+      end
 
       # determine day and month, taking into account ayyam-i-ha
       if days >= 342

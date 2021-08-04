@@ -8,7 +8,7 @@ module BahaiDate
     private
 
     def populate_calendar
-      date = BahaiDate.new(year: @bahai_era, month: 1, day: 1)
+      date = BahaiDate.new(year: @bahai_era, month: 1, day: 1, use_sunset: false)
       while date.year.bahai_era == @bahai_era
         add_to_calendar date
         date += 1
