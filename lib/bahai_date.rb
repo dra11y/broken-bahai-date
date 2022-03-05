@@ -9,5 +9,3 @@ require 'bahai_date/weekday'
 require 'bahai_date/occasion'
 require 'bahai_date/occasion_factory'
 require 'bahai_date/year_calendar'
-
-require 'pry'
